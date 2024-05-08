@@ -1,3 +1,4 @@
+require('dotenv').config();
 const path = require("path");
 // Import Libraries
 const express = require('express');
@@ -12,8 +13,7 @@ const apiRouter = require('./routes/apiRoutes');
 const authRouter = require('./routes/authRoutes');
 
 // Database connection string
-const MONGODB_URI = 'mongodb+srv://jonnygman427:AdventureBlog01!@adventureblog.jmcijyt.mongodb.net/AdventureBlog?retryWrites=true&w=majority&appName=AdventureBlog';
-
+const MONGODB_URI=`mongodb+srv://${process.env.MONGODB_USER}:${process.env.MONGODB_PASS}@adventureblog.jmcijyt.mongodb.net/${process.env.MONGODB_DEFAULT}?retryWrites=true&w=majority&appName=AdventureBlog`;
 // Initialize session store
 const store = new MongoDBStore({
     uri: MONGODB_URI,
