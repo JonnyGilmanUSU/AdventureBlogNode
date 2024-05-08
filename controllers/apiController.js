@@ -2,7 +2,8 @@ const BlogPost = require('../models/BlogPost');
 
 exports.getBlogPosts = async (req, res, next) => {
     try {
-        const categoryQuery = req.query.category ? { category: req.query.category } : {};
+        const category = req.headers['category'];
+        const categoryQuery = category ? { category: category } : {};
 
         const blogPosts = await BlogPost.find(categoryQuery);
         console.log(blogPosts)
@@ -12,6 +13,17 @@ exports.getBlogPosts = async (req, res, next) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+exports.getBlogPostDetails = async (req, res) => {
+    try {
+    console.log(req.params.id)
+      const post = await BlogPost.findById(req.params.id);
+      if (!post) return res.status(404).send('Post not found');
+      res.send(post);
+    } catch (error) {
+      res.status(500).send('Server error');
+    }
+  };
 
 exports.createBlogPost = async (req, res, next) => {
     try {
@@ -29,5 +41,27 @@ exports.createBlogPost = async (req, res, next) => {
     } catch (error) {
         console.error('Failed to create blog post:', error);
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+exports.getSearchResults = async (req, res, next) => {
+    const searchInput = req.query.search;
+    console.log("Search Input:  ", searchInput);
+
+    try {
+        const searchResults = await BlogPost.find({
+            $text: { $search: searchInput }
+        }, { score: { $meta: "textScore" } }).sort({ score: { $meta: "textScore" } });
+        
+        if (searchResults.length > 0) {
+            res.status(200).json({ successMessage: 'Search results fetched successfully', data: searchResults });
+        } else {
+            res.status(404).json({ message: 'No results found' });
+        }
+
+    } catch (error) {
+        console.log(error)
+        console.error('Search Error:', error);
+        res.status(500).json({ errorMessage: "Search Failed" });
     }
 }

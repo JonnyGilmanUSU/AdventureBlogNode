@@ -8,7 +8,7 @@ exports.postSignUp = async (req, res, next) => {
         const emailUnique = await User.checkEmailUnique(email);
 
         if (!emailUnique) {
-            return res.status(409).json({ message: 'Sorry, that email is taken. Please choose a different one.' });
+            return res.status(409).json({ message: 'Sorry, that email is taken.' });
         }
         // Email is unique then Create User Model
         const user = new User({
@@ -19,7 +19,7 @@ exports.postSignUp = async (req, res, next) => {
         });
         // Save user
         await user.save();
-        res.status(201).json({ message: 'Registration successful', redirectUrl: '/login' });
+        res.status(201).json({ successMessage: 'Registration successful', redirectUrl: '/login' });
     } catch (error) {
         res.status(500).json({ message: 'Oops there was an error registering user.' });
     }
@@ -60,9 +60,10 @@ exports.loginWebApp = async (req, res, next) => {
                 message: "Failed to save session data."
             });
         }
-            res.json({
+            res.status(201).json({
                 loginSuccess: true,
-                message: "Logged in successfully.",
+                user: user,
+                successMessage: "Logged in successfully.",
                 redirectUrl: "/"  // This is the URL to which you want to redirect the user
             });
         });
