@@ -139,3 +139,5 @@ client/build/
 README.md
 
 .DS_Store
+
+/server/.env
